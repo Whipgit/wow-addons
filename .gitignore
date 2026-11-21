@@ -1,0 +1,5 @@
+# Never commit game settings or SavedVariables if they get copied in here
+WTF/
+*.bak
+.DS_Store
+Thumbs.db
