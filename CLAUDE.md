@@ -14,8 +14,8 @@ This repository holds my own addons for **World of Warcraft: Forever**: role-pla
 
 ## Repo layout
 
-- Each addon is a top-level folder in this repo (`SummonLines/`, ...) containing a `.toc` whose filename matches the folder name exactly.
-- `link-addons.ps1` creates a directory junction in the game's `Interface\AddOns` for every addon folder here, so edits in the repo are live after `/reload`. Run it once after adding a new addon. Junctions need no admin rights, but writing into `Program Files (x86)` might; if it fails, run PowerShell as administrator once.
+- Each addon is a top-level folder in this repo (`WhipRPLines/`, ...) containing a `.toc` whose filename matches the folder name exactly.
+- `link-addons.ps1` reads the AddOns path from `WOW_ADDONS_DIR` in a local, gitignored `.env` (template: `.env.example`) and creates a directory junction in the game's `Interface\AddOns` for every addon folder here, so edits in the repo are live after `/reload`. Run it once after adding a new addon. Junctions need no admin rights, but writing into `Program Files (x86)` might; if it fails, run PowerShell as administrator once.
 - New addon checklist: create the folder and `.toc`, run `link-addons.ps1`, then restart the game client (a brand-new addon folder is only picked up at client start, not on `/reload`).
 - Repo-only files (this file, scripts, README) stay at the root; the game ignores anything without a `.toc`.
 
@@ -37,25 +37,23 @@ This repository holds my own addons for **World of Warcraft: Forever**: role-pla
 - Put user-editable content (text lines, toggles) in clearly labelled tables at the **top** of the file, with a comment explaining the format.
 - Slash commands: `SLASH_NAME1 = "/command"` + `SlashCmdList.NAME = function(msg) ... end`.
 - Persist settings via the `.toc` only when needed, with defaults applied on `ADDON_LOADED`. Default to `## SavedVariablesPerCharacter` (my characters have different voices); use account-wide `## SavedVariables` only for settings that are truly global.
-- Chat flavor lines use `%s` for the target's name; one `%s` per line.
+- Chat flavor lines use `%s` for the target's name; one `%s` per line. Moments without a name (demon summons) and `selfLines` use no `%s`.
+- To remove an addon's junction, use `cmd /c rmdir "<path>"` -- never `Remove-Item -Recurse`, which can delete the repo files behind it.
 - After writing or changing an addon, give me: the macro to use (if any), what to `/reload` (or whether a client restart is needed), and what to check in-game.
 
 ## Our addons
 
 | Folder | Status | What it does | Usage |
 |---|---|---|---|
-| `SummonLines` | Built, untested in-game. Run `link-addons.ps1`, then restart the client. | Random Warlock emote + spoken line when summoning. Lists at top of `SummonLines.lua`; `CHANNEL` and `USE_EMOTE` toggles. | Macro: `#showtooltip Ritual of Summoning` / `/summonline` / `/cast Ritual of Summoning` |
+| `WhipRPLines` | Built and linked, untested in-game. Needs a client restart. | All RP flavor lines, one engine. `/rpline <moment>` sends a random emote + line. Moments: summon, soulstone, imp, voidwalker, succubus, felhunter, infernal, doomguard, cannibalize, felsteed, dreadsteed. Text in `Lines.lua`, engine in `Core.lua`. | Macro: `/rpline <moment>` then `/cast` or `/use`. `/rpline` alone lists moments. |
 
-Keep this table updated when we add or change addons.
+Keep this table updated when we add or change addons. (`SummonLines` was folded into `WhipRPLines` as the `summon` moment and removed.)
 
-## Open decision: one RP addon or many
+## Decided: one RP addon (WhipRPLines)
 
-Planned next: Soulstone, Healthstone, Cannibalize (Forsaken racial), demon summons, Shaman lines for Aelith. They all share the same mechanics: pick a random line, fill in `%s`, send to a channel, optional emote, fired from a macro. Two ways to build that:
+All flavor lines live in `WhipRPLines`, with one table entry per moment in `Lines.lua` (per-moment `unit`, `channel`, `chance`, `selfLines`). This is the deliberate exception to the one-file convention: `Lines.lua` (content) + `Core.lua` (engine). New moments, including Aelith's Shaman lines, are new entries, not new addons.
 
-- **One addon per moment** (`SummonLines`, `SoulstoneLines`, ...): matches the one-file convention, but copies the same engine into every folder.
-- **One RP addon with a table per moment** and a slash command per moment (`/rpline summon`, `/rpline soulstone`): one engine, one place for toggles, lines grouped by character. Probably the better fit, but it becomes the one addon that "genuinely needs more" than one file (engine + a lines file).
-
-Decide this with me before building the second one.
+Not built yet: a per-moment cooldown/throttle for in-combat spells (Fear, Seduction, Death Coil, Life Tap). Those also need `unit = "focus"`/`"mouseover"` to match the cast macros.
 
 ## My characters (Horde)
 
@@ -68,8 +66,8 @@ Warlock flavor: dark, Chaos-tinged, the Nether as something that hungers, pain a
 
 ## Ideas backlog
 
-- Same flavor-line pattern for other Warlock moments: Soulstone, Healthstone handoff, Fear on a dangerous add, demon summons.
-- Cannibalize lines for the Warlock (Forsaken racial).
+- Line voice (set Nov 2026): dark and risky, not cute. Binding hurts and the Warlock enjoys it; the Nether always presses in and wants its due; the Warlock has been dead before. Soulstone lines run 100-135 chars (rare cast); demon lines are shorter (50-100) because they are resummoned often. Chat cap is 255 per message. Every emote names the action plainly first ("summons a Voidwalker", "places a Soulstone on %s"), then adds flavor; emotes on targeted moments take %s, and self-casts use `selfEmotes`.
+- More Warlock moments: Banish, Enslave Demon, Healthstone creation (PARTY "stones are ready"), and in-combat spells once a throttle exists.
 - Shaman flavor lines with a wind/elemental voice for Aelith.
 - A small reminders or tracker addon (soul shards, buffs, profession cooldowns) -- scope with me first, and check how shards work on Forever before designing around them.
 

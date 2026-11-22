@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: Whip RP Lines
+## Notes: Random role-play emotes and lines from macros. Type /rpline for the list.
+## Version: 1.0
+
+Lines.lua
+Core.lua
