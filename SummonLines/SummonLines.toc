@@ -1,6 +1,0 @@
-## Interface: 16001
-## Title: Summon Lines
-## Notes: Random Warlock flavor text when summoning. Use /summonline in a macro.
-## Version: 1.0
-
-SummonLines.lua

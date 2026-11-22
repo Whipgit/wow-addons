@@ -2,8 +2,25 @@
 # so edits here are live after /reload. Safe to run repeatedly.
 # An addon is any top-level folder containing <FolderName>.toc.
 
-$AddOnsDir = "C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns"
 $RepoDir = $PSScriptRoot
+
+# The AddOns path comes from .env (gitignored) so machine-specific paths never reach the remote.
+# Format: KEY=VALUE per line, # for comments. See .env.example.
+$EnvFile = Join-Path $RepoDir ".env"
+if (-not (Test-Path $EnvFile)) {
+    Write-Error "No .env found. Copy .env.example to .env and set WOW_ADDONS_DIR."
+    exit 1
+}
+$AddOnsDir = $null
+foreach ($line in Get-Content $EnvFile) {
+    if ($line -match '^\s*WOW_ADDONS_DIR\s*=\s*(.+?)\s*$') {
+        $AddOnsDir = $Matches[1].Trim('"')
+    }
+}
+if (-not $AddOnsDir) {
+    Write-Error "WOW_ADDONS_DIR is not set in .env."
+    exit 1
+}
 
 if (-not (Test-Path $AddOnsDir)) {
     Write-Error "AddOns folder not found: $AddOnsDir"

@@ -3,3 +3,6 @@ WTF/
 *.bak
 .DS_Store
 Thumbs.db
+
+# Local machine settings (paths); copy .env.example to .env
+.env
