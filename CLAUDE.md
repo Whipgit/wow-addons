@@ -51,7 +51,7 @@ Keep this table updated when we add or change addons. (`SummonLines` was folded 
 
 ## Decided: one RP addon (WhipRPLines)
 
-All flavor lines live in `WhipRPLines`, with one table entry per moment in `Lines.lua` (per-moment `unit`, `channel`, `chance`, `selfLines`). This is the deliberate exception to the one-file convention: `Lines.lua` (content) + `Core.lua` (engine). New moments, including Aelith's Shaman lines, are new entries, not new addons.
+All flavor lines live in `WhipRPLines`, with one table entry per moment in `Lines.lua` (per-moment `unit`, `channel`, `chance`, `speakChance`, `whisper`, `selfLines`). This is the deliberate exception to the one-file convention: `Lines.lua` (content) + `Core.lua` (engine). New moments, including Aelith's Shaman lines, are new entries, not new addons.
 
 Not built yet: a per-moment cooldown/throttle for in-combat spells (Fear, Seduction, Death Coil, Life Tap). Those also need `unit = "focus"`/`"mouseover"` to match the cast macros.
 
@@ -66,7 +66,7 @@ Warlock flavor: dark, Chaos-tinged, the Nether as something that hungers, pain a
 
 ## Ideas backlog
 
-- Line voice (set Nov 2026): dark and risky, not cute. Binding hurts and the Warlock enjoys it; the Nether always presses in and wants its due; the Warlock has been dead before. Soulstone lines run 100-135 chars (rare cast); demon lines are shorter (50-100) because they are resummoned often. Chat cap is 255 per message. Every emote names the action plainly first ("summons a Voidwalker", "places a Soulstone on %s"), then adds flavor; emotes on targeted moments take %s, and self-casts use `selfEmotes`.
+- Line voice (set Nov 2026): dark and risky, not cute. Binding hurts and the Warlock enjoys it; the Nether always presses in and wants its due; the Warlock has been dead before. Soulstone lines run 100-135 chars (rare cast); demon lines are shorter (50-100) because they are resummoned often. Chat cap is 255 per message. Every emote names the action plainly first ("summons a Voidwalker", "places a Soulstone on %s"), then adds flavor; emotes on targeted moments take %s, and self-casts use `selfEmotes`. Exception: `cannibalize` deliberately mixes in short, silly spoken lines ("Nom nom nom. Delicious.") alongside the dark ones, because it is cast constantly.
 - More Warlock moments: Banish, Enslave Demon, Healthstone creation (PARTY "stones are ready"), and in-combat spells once a throttle exists.
 - Shaman flavor lines with a wind/elemental voice for Aelith.
 - A small reminders or tracker addon (soul shards, buffs, profession cooldowns) -- scope with me first, and check how shards work on Forever before designing around them.

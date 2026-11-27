@@ -22,8 +22,15 @@
 --   channel     Where the spoken line goes: "SAY" (default), "PARTY",
 --               "YELL", "EMOTE". PARTY when not grouped only previews the
 --               line in your own chat window.
+--   speak       Set to false to send only the emote. The spoken lines stay
+--               in the file, so setting it back to true restores them.
 --   chance      0 to 1. Chance the moment fires at all (1 = always, default).
 --               Lower it for things you cast often. The spell is still cast.
+--   speakChance 0 to 1. Chance the spoken line is sent (default 1). The emote
+--               still fires every time; only the line is rolled.
+--   whisper     Set to true to also whisper the spoken line to the `unit`
+--               player (e.g. the person you are summoning, who is too far
+--               away to hear /say). Only when a line is actually sent.
 --
 -- Nothing repeats twice in a row.
 
@@ -33,9 +40,11 @@ ns.moments = {
 
     -- ===================== WARLOCK =====================
 
-    -- Ritual of Summoning. Target the player you are summoning.
+    -- Ritual of Summoning. Target the player you are summoning. The line is
+    -- said aloud and whispered to them, so both ends read the same thing.
     summon = {
         unit = "target",
+        whisper = true,
         emotes = {
             "begins a Ritual of Summoning for %s. A burning sigil tears open in the air, and the Nether leaks through.",
             "raises hands steaming with fel light and opens a summoning portal to bring %s here.",
@@ -53,9 +62,18 @@ ns.moments = {
             "Every mile between us, %s, I pay for in pain. It is a good pain. Come.",
             "The portal is open, %s. Some of what lives between worlds will try to follow you out. Leave that to me.",
             "%s, I have your soul by a thread and the Nether by the throat. Come through before either one slips.",
-            "Click the portal and lend me your strength. I am pulling %s through the dark, and the dark does not let go easily.",
             "Come, %s. I crossed the grave once and came back. Crossing the Nether is nothing. For me, at least.",
             "I call, %s, and the Nether carries you. It will want a toll for the ride. I have already paid it in blood.",
+            "Hold still, %s. The Nether is stripping you to the bone and putting you back together. Mostly in the right order.",
+            "Something in the dark just learned your name, %s. I gave it to them. It was the price.",
+            "The Nether does not carry the living for free, %s. It took a little of you. You will not miss it. Probably.",
+            "I am dragging you through the place where souls go to be eaten, %s. Keep yours close.",
+            "%s, if you hear whispering on the way through, do not answer. Not ever.",
+            "Pain is the thread I pull you along, %s. Mine, and now yours. Feel how it burns.",
+            "The last one I summoned came through screaming, %s. You can choose to come through quietly.",
+            "Your heartbeat is very loud from here, %s. The Nether hears it too. Come before it gets hungry.",
+            "I am the door, %s. Walk through me and try not to look at what I keep inside.",
+            "I died once and the dark kept me, %s. Now I lend you to it, just for a moment. It always gives you back. Usually.",
         },
     },
 
@@ -104,15 +122,20 @@ ns.moments = {
         },
     },
 
-    -- Demon summons. No %s (the demon has no name yet when the line goes out).
+    -- Demon summons. Emote only (speak = false); set speak = true on a
+    -- demon to say its lines again. No %s in these.
     -- These get resummoned often; if they start to feel spammy, add
     -- chance = 0.5 (or lower) to a moment.
 
     imp = {
+        speak = false,
         emotes = {
             "summons an Imp. Flame spits up from the ground, and the cackling little demon crawls out of it.",
             "snaps at the fire until it grows a mouth, laughs, and becomes an Imp.",
             "calls an Imp out of the Nether. It arrives already muttering insults.",
+            "summons an Imp with a flick of the wrist. It lands in a puff of sulfur, already complaining.",
+            "pricks a finger and lets one drop of blood hiss onto the ground. An Imp bursts out of the steam.",
+            "summons an Imp, holding it up by the scruff for a moment before letting it drop.",
         },
         lines = {
             "Out of the fire, little wretch. Burn what I point at, and keep your opinions to yourself.",
@@ -125,10 +148,14 @@ ns.moments = {
     },
 
     voidwalker = {
+        speak = false,
         emotes = {
             "summons a Voidwalker. The light around it dims, and the dark itself stands up.",
             "tears open the space between worlds and summons a Voidwalker, hollow and silent.",
             "goes very still as cold pours out of nowhere and takes the shape of a Voidwalker.",
+            "summons a Voidwalker. Frost creeps over the ground as the hollow shape rises.",
+            "speaks into the silence between heartbeats, and a Voidwalker pours out of it.",
+            "summons a Voidwalker and watches it bow low, every movement full of quiet hatred.",
         },
         lines = {
             "Rise from the empty places, hollow one. There is pain to be taken, and you will take it for me.",
@@ -141,10 +168,14 @@ ns.moments = {
     },
 
     succubus = {
+        speak = false,
         emotes = {
             "summons a Succubus. The shadows part with the crack of a whip.",
             "traces a slow sigil in the air, and a Succubus steps out of it, laughing low and sweet.",
             "breathes a name into the dark and summons a Succubus, perfumed with brimstone.",
+            "summons a Succubus. She steps out of a ring of violet flame, smiling as if she already knows a secret.",
+            "beckons with one finger and summons a Succubus, who answers with a slow, mocking curtsy.",
+            "summons a Succubus. The air turns warm and sweet, then sharp with the smell of brimstone.",
         },
         lines = {
             "Come, mistress. Your whip is sharp and your smile is sharper. Remember whose chain you wear.",
@@ -157,10 +188,14 @@ ns.moments = {
     },
 
     felhunter = {
+        speak = false,
         emotes = {
             "summons a Felhunter. It slinks out of the dark with a wet, eager snuffle.",
             "pulls a thread of shadow taut and summons a Felhunter, all tendrils and hunger.",
             "offers a palm of raw arcane light and summons a Felhunter to feed on it.",
+            "summons a Felhunter. The beast circles once, tendrils twitching toward every nearby spell.",
+            "taps the ground twice, and a Felhunter claws its way up out of the shadows.",
+            "summons a Felhunter, which immediately sniffs at the warlock's hands for leftover magic.",
         },
         lines = {
             "Come, hound of the Nether. I can feel the magic in the air, and so can you. Feed.",
@@ -173,10 +208,14 @@ ns.moments = {
     },
 
     infernal = {
+        speak = false,
         emotes = {
             "calls down an Infernal from the sky. Far above, the clouds begin to glow.",
             "speaks one burning word upward, summoning an Infernal to crash down like a falling star.",
             "drags a hand down through the air, pulling an Infernal out of the stars.",
+            "points at the ground, and an Infernal smashes down from the sky in a burst of green fire.",
+            "summons an Infernal. A burning stone streaks across the sky and craters the earth.",
+            "calls an Infernal down from the heavens. The impact shakes the ground for a long moment.",
         },
         lines = {
             "Hear the sky crack. Something is falling, and I am the one who threw it.",
@@ -189,10 +228,14 @@ ns.moments = {
     },
 
     doomguard = {
+        speak = false,
         emotes = {
             "begins the Ritual of Doom, cutting a palm and letting the blood fall into the circle.",
             "chants the Ritual of Doom until the voice is no longer entirely the warlock's own.",
             "begins the Ritual of Doom to summon a Doomguard. The ground cracks, and the Doomguard starts to climb out.",
+            "leads the Ritual of Doom, voice rising as the circle begins to burn.",
+            "begins the Ritual of Doom. The circle glows red, and a terrible voice answers from below.",
+            "begins the Ritual of Doom, drawing the circle in fel fire while the others hold their places.",
         },
         lines = {
             "The circle is drawn and the price is blood. One of us pays it. The Nether chooses who.",
@@ -205,9 +248,10 @@ ns.moments = {
     },
 
     -- Cannibalize (Forsaken racial). No %s: the corpse is usually not your
-    -- target. You use this a lot while leveling; add chance = 0.5 if it
-    -- gets to be too much, or channel = "EMOTE" to keep the line off /say.
+    -- target. You use this a lot while leveling, so the emote fires every
+    -- time but the /say line only half the time.
     cannibalize = {
+        speakChance = 0.5,
         emotes = {
             "kneels over a corpse and begins to eat it, unhurried, as if this were the most natural thing in the world.",
             "tears into the corpse and feeds on it. Nobody watches for long.",
@@ -215,6 +259,23 @@ ns.moments = {
             "pulls a strip of cold flesh from the corpse and chews, eyes half-closed, almost reverent.",
             "drops to a crouch and starts eating the body. The sounds that follow are not polite.",
             "feeds on the corpse to mend wounds. Somewhere beyond the veil, something hungry approves.",
+            "feeds on the corpse with dreadful enthusiasm.",
+            "finishes eating the corpse, wipes a hand on the robes and sighs, satisfied.",
+            "eats from the corpse like a ghoul, then dabs at the corners of the mouth, ever so politely.",
+            "tears a strip from the corpse and chews thoughtfully.",
+            "crouches over the body to feed and makes unpleasant noises.",
+            "feeds on the corpse, pausing only to pick something out of the teeth.",
+            "eats the corpse with the quiet focus of someone doing a crossword.",
+            "kneels to feed on the corpse and hums a tuneless little song while chewing.",
+            "feeds on the corpse, then glances up as if daring anyone to comment.",
+            "drags the corpse a little closer and digs in.",
+            "eats from the corpse, loose stitches tightening as the flesh goes down.",
+            "crouches to feed and swats away a fly that had the same idea.",
+            "feeds on the dead, slow and deliberate, savoring every bite.",
+            "eats the corpse and lets out a small, contented burp.",
+            "kneels to feed. The jaw makes a sound jaws should not make.",
+            "feeds on the corpse, fel-green eyes never leaving the horizon.",
+            "eats the corpse, then tucks a scrap away in a pouch for later.",
         },
         lines = {
             "Do not look at me like that. The dead feed the dead. It is the oldest law there is.",
@@ -225,6 +286,31 @@ ns.moments = {
             "Every wound you gave me, you will now repay. Bite by bite.",
             "I was a corpse once. I know exactly what you are worth.",
             "Hold still. Ah. You already are.",
+            -- Short and silly ones, on purpose: you cast this constantly.
+            "Nom nom nom. Delicious.",
+            "Mmm. Crunchy.",
+            "Waste not.",
+            "Still warm. Lucky me.",
+            "Five-second rule.",
+            "Needs salt.",
+            "The Lich King never fed us this well.",
+            "Rot is just flavor with patience.",
+            "One corpse's end is another corpse's lunch.",
+            "Tastes exactly like I expected.",
+            "Mmm. Vintage.",
+            "Leftovers!",
+            "Could use a garnish.",
+            "Free lunch.",
+            "Chef's kiss.",
+            "Second breakfast.",
+            "Everything ends up as food for something. Today, that something is me.",
+            "Flesh mends flesh. The Nether is not the only thing that hungers.",
+            "I remember being alive. I don't remember being this well fed.",
+            "You fought hard. You'll mend me just as hard.",
+            "Every bite is a wound closing. Every wound is a lesson.",
+            "The living fear the grave. The grave fears me.",
+            "Your soul went to the Nether. The rest of you is mine.",
+            "The dead keep no secrets. They taste of every one.",
         },
     },
 

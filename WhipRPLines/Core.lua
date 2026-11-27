@@ -21,6 +21,23 @@ local function pick(list)
     return list[i]
 end
 
+-- Use the global SendChatMessage: it is proven to work in-game on Forever.
+-- Switching to C_ChatInfo.SendChatMessage (the wiki's modern replacement)
+-- broke emotes, so it is only a fallback in case a patch removes the global.
+local SendChatApi = SendChatMessage or (C_ChatInfo and C_ChatInfo.SendChatMessage)
+local API_NAME = SendChatMessage and "SendChatMessage" or "C_ChatInfo.SendChatMessage"
+
+-- /rpline debug toggles this: report every send and what the API returned.
+local debugMode = false
+
+-- `target` is only used for WHISPER (the player's name, with realm if needed).
+local function SendChat(text, channel, target)
+    local result = SendChatApi(text, channel, nil, target)
+    if debugMode then
+        note("debug: " .. channel .. (target and (" to " .. target) or "") .. " via " .. API_NAME .. " -> " .. tostring(result) .. " | " .. text:sub(1, 40))
+    end
+end
+
 local function inGroup()
     if IsInGroup then return IsInGroup() end
     return (GetNumPartyMembers and GetNumPartyMembers() > 0)
@@ -32,7 +49,7 @@ local function send(text, channel)
         note("(preview, not grouped) " .. text)
         return
     end
-    SendChatMessage(text, channel)
+    SendChat(text, channel)
 end
 
 -- Works out who the moment is about.
@@ -68,6 +85,9 @@ local function run(key)
 
     local who, name = resolve(m)
     if not who then return end
+    if debugMode then
+        note("debug: " .. key .. " -> " .. who .. (name and (" (" .. name .. ")") or "") .. ", speak=" .. tostring(m.speak ~= false))
+    end
 
     local emote, line
     if who == "self" then
@@ -78,8 +98,17 @@ local function run(key)
         line = fill(pick(m.lines), name)
     end
 
-    if emote then SendChatMessage(emote, "EMOTE") end
-    if line then send(line, m.channel or "SAY") end
+    if emote then SendChat(emote, "EMOTE") end
+    local speaks = m.speak ~= false and (not m.speakChance or math.random() <= m.speakChance)
+    if line and speaks then
+        send(line, m.channel or "SAY")
+        -- whisper = true: the same line also goes to the named player, so
+        -- someone far away (a summon) reads what the people nearby hear.
+        if m.whisper and who == "other" then
+            local to = (GetUnitName and GetUnitName(m.unit, true)) or name
+            SendChat(line, "WHISPER", to)
+        end
+    end
 end
 
 local function listMoments()
@@ -122,6 +151,9 @@ SlashCmdList.WHIPRPLINES = function(msg)
     local key = (msg or ""):match("^%s*(%S*)"):lower()
     if key == "" then
         listMoments()
+    elseif key == "debug" then
+        debugMode = not debugMode
+        note("debug " .. (debugMode and "on" or "off") .. " (sending via " .. API_NAME .. ")")
     else
         run(key)
     end
